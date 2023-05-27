@@ -1,21 +1,55 @@
-#include <SoftwareSerial.h>   // Incluimos la librería  SoftwareSerial  
-SoftwareSerial BT(10,11);    // Definimos los pines RX y TX del Arduino conectados al Bluetooth
+class Motor {
+
+    public:
+        int maxSpeed;
+        int speedPin;
+        int inputA;
+        int inputB;
+
+        Motor() {}
+
+        void init(int MaxSpeed, int SpeedPin, int InputA, int InputB) {
+            maxSpeed = MaxSpeed;
+            speedPin = SpeedPin;
+            inputA = InputA;
+            inputB = InputB;
+            pinMode(speedPin, OUTPUT);
+            pinMode(inputA, OUTPUT);
+            pinMode(inputB, OUTPUT);
+        }
+
+        void setSpeed(int percentage) {
+            int speed = (maxSpeed*percentage)/100;
+            analogWrite(speedPin,speed);
+        }
+
+        void moveForward() {
+            digitalWrite(inputA, HIGH);
+            digitalWrite(inputB, LOW);
+        }
+        
+        void moveBackward() {
+            digitalWrite(inputA, LOW);
+            digitalWrite(inputB, HIGH);
+        }
+        
+        void stop() {
+            digitalWrite(inputA, LOW);
+            digitalWrite(inputB, LOW);
+        }
+
+};
+
+Motor rightMotor;
+Motor leftMotor;
  
 void setup()
 {
-  BT.begin(9600);       // Inicializamos el puerto serie BT que hemos creado
-  Serial.begin(9600);   // Inicializamos  el puerto serie  
+    Serial.begin(9600);
+    rightMotor.init(255, 11, 12, 13);
+    leftMotor.init(200, 3, 2, 4);
 }
  
 void loop()
 {
-  if(BT.available())    // Si llega un dato por el puerto BT se envía al monitor serial
-  {
-    Serial.write(BT.read());
-  }
- 
-  if(Serial.available())  // Si llega un dato por el monitor serial se envía al puerto BT
-  {
-     BT.write(Serial.read());
-  }
 }
